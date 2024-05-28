@@ -17,7 +17,7 @@ An in-depth paragraph about your project and overview of use.
 
 ### Dependencies
 
-* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
+see requirements.txt for all dependencies
 
 ### Installing
 
@@ -43,8 +43,7 @@ command to run if program contains helper info
 
 Contributors names and contact info
 
-ex. Dominique Pizzie  
-ex. [@DomPizzie](https://twitter.com/dompizzie)
+Hugo Woutersen
 
 ## Version History
 

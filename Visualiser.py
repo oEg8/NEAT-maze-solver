@@ -121,10 +121,10 @@ class Visualiser:
             self.screen.fill(self.white)
             for row in range(len(self.grid)):
                 for col in range(len(self.grid[row])):
-                    if self.grid[row][col] == 3:
-                        color = self.green
-                    elif row == self.pos[ROW] and col == self.pos[COL]:
+                    if row == self.pos[ROW] and col == self.pos[COL]:
                         color = self.blue
+                    elif self.grid[row][col] == 3:
+                        color = self.green
                     elif self.grid[row][col] == 2:
                         color = self.red
                     elif self.grid[row][col] == 1:

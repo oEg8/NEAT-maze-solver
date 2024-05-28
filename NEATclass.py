@@ -251,7 +251,7 @@ if __name__ == '__main__':
         maze = MazeMaker(4, 4, 0.5, 7)
         grid = maze.return_maze()
         start = (maze.return_start_coor()[ROW], maze.return_start_coor()[COL])
-        goal = (maze.return_end_coor()[ROW], maze.return_end_coor()[COL])
+        goal = (maze.return_goal_coor()[ROW], maze.return_goal_coor()[COL])
 
         if os.path.exists(os.path.join(LOCAL_DIR, 'grids')):
             np.save(os.path.join(LOCAL_DIR, f'grids/grid{i}.npy'), grid)
