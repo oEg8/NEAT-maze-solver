@@ -8,17 +8,27 @@ COL = 1
 
 class Visualiser:
     """
-    This class uses the pygame library to create a visualisation given a maze,
-    start coordinate, end coordinate and a route.
+    This class uses the pygame library to create a visualization given a maze,
+    start coordinate, end coordinate, and a route.
 
     - The maze being a numpy array (0: empty cell, 1: wall, 2: start, 3: end)
     - The route being a list of directions (0: up, 1: down, 2: left, 3: right)
     """
-    def __init__(self, grid: np.ndarray, pos: tuple[int, int], goal: tuple[int, int], route: list[tuple[int, int]]) -> None:
+    def __init__(self, grid: np.ndarray, start: tuple[int, int], goal: tuple[int, int], route: list[tuple[int, int]]) -> None:
+        """
+        Initialize the Visualiser object.
+
+        Parameters:
+            grid (np.ndarray): The maze grid.
+            pos (Tuple[int, int]): The starting position.
+            goal (Tuple[int, int]): The goal position.
+            route (List[Tuple[int, int]]): List of directions for the route.
+        """
         pygame.init()
 
         self.grid = grid
-        self.pos = pos
+        self.start = start
+        self.pos = [self.start[0], self.start[1]]
         self.route = route
         self.goal = goal
 
@@ -48,7 +58,8 @@ class Visualiser:
 
     def draw_maze(self):
         """
-        This method draws the maze and is able to receive some keyboard inputs:
+        Draw the maze and respond to following keyboard inputs:
+
         'p':    Plays and pauses the visualisation
         'Esc':  Stops and exits the visualisation
         'up arrow':     Increases fps with 1
@@ -87,7 +98,7 @@ class Visualiser:
                         else:
                             state = RUNNING
                     elif event.key == pygame.K_r:
-                        self.pos = [start[ROW], start[COL]]
+                        self.pos = [self.start[ROW], self.start[COL]]
                         route_index = 0
                         self.solved = False
                         state = PAUSE
@@ -162,22 +173,3 @@ class Visualiser:
 
             pygame.display.flip()
             clock.tick(fps)
-
-
-if __name__ == '__main__':
-    grid = np.array([[2, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-                    [1, 1, 1, 1, 1, 0, 1, 1, 1, 0],
-                    [1, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-                    [1, 1, 0, 1, 1, 1, 1, 1, 0, 1],
-                    [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-                    [0, 1, 1, 0, 0, 0, 0, 1, 0, 1],
-                    [0, 1, 1, 0, 1, 1, 0, 1, 0, 0],
-                    [0, 0, 0, 0, 1, 0, 0, 0, 1, 1],
-                    [0, 1, 1, 0, 1, 1, 1, 0, 1, 3],
-                    [0, 0, 1, 0, 0, 1, 0, 0, 0, 0]])
-
-    start = (0, 0)
-    goal = (8, 9)
-    route = [3, 3, 3, 3, 3, 1, 1, 2, 2, 2, 1, 1, 2, 2, 1, 1,
-             1, 3, 3, 3, 0, 0, 3, 3, 3, 1, 1, 3, 1, 1, 3, 3, 0]
-    Visualiser(grid, [start[ROW], start[COL]], goal, route).draw_maze()

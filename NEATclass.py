@@ -4,22 +4,26 @@ import neat
 from MazeMaker import MazeMaker
 import numpy as np
 from Visualiser import Visualiser
-import matplotlib.pyplot as plt
 import pickle
 
 
-LOCAL_DIR = os.path.dirname(__file__)
 ROW = 0
 COL = 1
 
+UP = 0
+DOWN = 1
+LEFT = 2
+RIGHT = 3
+
 
 def save_model(network, filename: str):
+    """Saves NEAT model with pickle"""
     with open(filename, 'wb') as f:
         pickle.dump(network, f)
         f.close()
 
-
 def load_model(filename: str):
+    """Loads NEAT model with pickle"""
     return pickle.load(open(filename, 'rb')) 
 
 
@@ -29,6 +33,14 @@ class neatSolver:
     to solve a maze.
     """
     def __init__(self, grid: np.ndarray, start: tuple[int, int], goal: tuple[int, int]) -> None:
+        """
+        Initialize the neatSolver object.
+
+        Parameters:
+            grid (np.ndarray): The maze grid.
+            start (Tuple[int, int]): The starting position.
+            goal (Tuple[int, int]): The goal position.
+        """
         self.grid = grid
         self.start = start
         self.goal = goal
@@ -46,15 +58,22 @@ class neatSolver:
     
     def move(self, pos: list[int, int], action: int) -> list[int, int]:
         """
-        This method moves the player 1 step to the desired position
+        Move the player by one step in a given direction.
+
+        Parameters:
+            pos (List[int, int]): Current position.
+            action (int): Action to take.
+
+        Returns:
+            List[int, int]: New position after the move.
         """
-        if action == 0:  # up
+        if action == UP:
                 pos[ROW] -= 1
-        elif action == 1:  # down
+        elif action == DOWN:
                 pos[ROW] += 1
-        elif action == 2:  # left
+        elif action == LEFT:
                 pos[COL] -= 1
-        elif action == 3:  # right
+        elif action == RIGHT:
                 pos[COL] += 1
 
         return pos
@@ -62,7 +81,13 @@ class neatSolver:
 
     def random_move(self, pos: list[int, int]) -> tuple[list[int, int], int]:
         """
-        This method moves the player. The direction is chosen randomply out of the possible actions for that position.
+        Move the player randomly among possible actions.
+
+        Parameters:
+            pos (List[int, int]): Current position.
+
+        Returns:
+            Tuple[List[int, int], int]: New position after the move and the action taken.
         """
         random_move = np.random.choice(self.possible_actions(self.grid, pos))
         pos = self.move(pos, random_move)
@@ -72,8 +97,13 @@ class neatSolver:
 
     def novelty_score(self, path: list[tuple[int, int]]) -> float:
         """
-        This method counts the amount of times the algorithms has been on a
-        unique posistion and penalizes with the novelty penalty * that amount
+        Calculate the novelty score based on unique positions.
+
+        Parameters:
+            path (List[Tuple[int, int]]): List of positions visited.
+
+        Returns:
+            float: Novelty score.
         """
         novel_score = 0
         unique_positions = []
@@ -91,47 +121,64 @@ class neatSolver:
         return novel_score
 
 
-    def possible_actions(self, grid: np.ndarray, pos: tuple[int, int]) -> list:
+    def possible_actions(self, grid: np.ndarray, pos: tuple[int, int]) -> list[int]:
         """
-        This method returns a list of possible moves the player can take given
-        a grid and a position
+        Return possible moves given a grid and a position.
+
+        Parameters:
+            grid (np.ndarray): The maze grid.
+            pos (Tuple[int, int]): Current position.
+
+        Returns:
+            List[int]: List of possible actions.
         """
         actions = []
         if pos[ROW] - 1 >= 0 and grid[pos[ROW] - 1][pos[COL]] != 1:
-            actions.append(0)
+            actions.append(UP)
         if pos[ROW] + 1 < len(grid) and grid[pos[ROW] + 1][pos[COL]] != 1:
-            actions.append(1)
+            actions.append(DOWN)
         if pos[COL] - 1 >= 0 and grid[pos[ROW]][pos[COL] - 1] != 1:
-            actions.append(2)
+            actions.append(LEFT)
         if pos[COL] + 1 < len(grid[ROW]) and grid[pos[ROW]][pos[COL] + 1] != 1:
-            actions.append(3)
+            actions.append(RIGHT)
 
         return actions
 
 
     def distance_to_goal(self, pos: tuple[int, int], goal: tuple[int, int]) -> int:
+        """
+        Calculate Manhattan distance from current position to goal.
+
+        Parameters:
+            pos (Tuple[int, int]): Current position.
+            goal (Tuple[int, int]): Goal position.
+
+        Returns:
+            int: Manhattan distance to goal.
+        """
         return abs(pos[ROW] - goal[ROW]) + abs(pos[COL] - goal[COL])
 
 
     def reset_pos(self) -> list[int, int]:
         """
-        This method resets the position of the player to the starting position
-        so the next iteration can start.
+        Reset the player position to the starting position.
+
+        Returns:
+            List[int, int]: Starting position.
         """
         return [start[ROW], start[COL]]
 
 
-    def calc_fitness(self, genome, config) -> int:
+    def calc_fitness(self, genome, config: str) -> int:
         """
-        This method calculates the fitness for the given genome. This numberf
-        is to be maximised.
+        Calculate the fitness for a given genome.
 
-        The fitness score consists of:
-            - Amount of steps taken -
-            - Absolute distance from current posision to goal -
-            - Novelty score -
-            - A penalty for illegal steps --
-            - A reward for reaching the goal +++
+        Parameters:
+            genome: Genome to calculate fitness for.
+            config (str): NEAT configuration file path.
+
+        Returns:
+            int: Fitness value.
         """
         fitness = 0
         pos = self.reset_pos()
@@ -180,19 +227,32 @@ class neatSolver:
         return fitness
 
 
-    def eval_genomes(self, genomes, config):
+    def eval_genomes(self, genomes, config) -> None:
         """
-        This method evaluates the genomes and creates the genome objects for
-        the algorithm to use.
+        Evaluate the genomes and assign fitness.
+
+        Parameters:
+            genomes: List of genomes to evaluate.
+            config: NEAT configuration.
         """
         for genome_id, genome in genomes:  # genome_id is used by the neat-python library  
             fitness = self.calc_fitness(genome, config)
             genome.fitness = fitness
 
 
-    def run(self, config_file, num_evals):
+    def run(self, config_file: str, num_generations: int):
         """
-        This method runs the algorithm.
+        Run the NEAT algorithm.
+
+        Parameters:
+            config_file (str): Path to NEAT configuration file.
+            num_generations (int): Maximum nomber of generations allowed.
+        
+        Returns:
+            tuple[int, int, int]:
+                - max_gen_fitness: Maximum generation fitness.
+                - num_generations: Number of generations completed.
+                - winner_directions: Directions of best genome
         """
         config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                              neat.DefaultSpeciesSet, neat.DefaultStagnation,
@@ -202,10 +262,9 @@ class neatSolver:
         p = neat.Population(config)
 
         # check if an earlier trained model exists and use that best genome as the initial training genome
-        if os.path.exists(os.path.join(LOCAL_DIR, 'best_neat_solver.plk')):
+        if os.path.exists('best_neat_solver.plk'):
             # Load the previously trained model
-            winner_net = load_model(os.path.join(LOCAL_DIR,
-                                                         'best_neat_solver.plk'))
+            winner_net = load_model('best_neat_solver.plk')
 
             # Create a genome from the loaded model's structure
             winner_genome = neat.DefaultGenome(1)  # Set the ID to 1
@@ -221,12 +280,11 @@ class neatSolver:
         stats = neat.StatisticsReporter()
         p.add_reporter(stats)
 
-        p.run(self.eval_genomes, num_evals)
+        p.run(self.eval_genomes, num_generations)
 
         # Save the best genome
         best_genome = stats.best_genome()
-        save_model(best_genome, os.path.join(LOCAL_DIR,
-                                                     'best_neat_solver.plk'))
+        save_model(best_genome, 'best_neat_solver.plk')
 
         max_gen_fitness = best_genome.fitness
         num_generations = len(stats.get_fitness_mean())
@@ -238,26 +296,26 @@ class neatSolver:
 
 if __name__ == '__main__':
 
-    config_path = os.path.join(LOCAL_DIR, 'neat-configuration.txt')
+    config_path = 'neat-configuration.txt'
 
     results = {"ID": [],
                "MAX_FITNESS": [],
                "NUM_GENERATIONS": [],
                "TIME_TO_SOLVE": []}
 
-    for i in range(10):  # increase for learning on multiple mazes
+    for i in range(10):  # increase for learning on more mazes
         start_time = time.time()
 
-        maze = MazeMaker(4, 4, 0.5, 7)
+        maze = MazeMaker(4, 4, 0.5, 7)  # NOTE: when changing maze size, change input paramater accordingly in config file.
         grid = maze.return_maze()
         start = (maze.return_start_coor()[ROW], maze.return_start_coor()[COL])
         goal = (maze.return_goal_coor()[ROW], maze.return_goal_coor()[COL])
 
-        if os.path.exists(os.path.join(LOCAL_DIR, 'grids')):
-            np.save(os.path.join(LOCAL_DIR, f'grids/grid{i}.npy'), grid)
+        if os.path.exists('grids'):
+            np.save(f'grids/grid{i}.npy', grid)
         else:
-            os.mkdir(os.path.join(LOCAL_DIR, 'grids'))
-            np.save(os.path.join(LOCAL_DIR, f'grids/grid{i}.npy'), grid)
+            os.mkdir('grids')
+            np.save(f'grids/grid{i}.npy', grid)
 
         n = neatSolver(grid, start, goal)
 
@@ -271,20 +329,5 @@ if __name__ == '__main__':
         results["NUM_GENERATIONS"].append(num_generations)
         results["TIME_TO_SOLVE"].append(time_to_solve)
 
-    # print(results)
 
-    # fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(14, 5))
-    # ax1.plot(results['ID'], results['MAX_FITNESS'], label='MAX_FITNESS', color='blue')
-    # ax1.set_xlabel('ID')
-    # ax1.set_ylabel('MAX_FITNESS')
-    # ax2.plot(results['ID'], results['NUM_GENERATIONS'], label='NUM_GENERATIONS', color='red')
-    # ax2.set_xlabel('ID')
-    # ax2.set_ylabel('NUM_GENERATIONS')
-    # ax3.plot(results['ID'], results['TIME_TO_SOLVE'], label='TIME_TO_SOLVE', color='green')
-    # ax3.set_xlabel('ID')
-    # ax3.set_ylabel('TIME_TO_SOLVE')
-    # plt.tight_layout()
-    # plt.show()
-
-    # print(winner_directions)
     Visualiser(grid, [start[ROW], start[COL]], goal, winner_directions).draw_maze()

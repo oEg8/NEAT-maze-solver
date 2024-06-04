@@ -1,67 +1,62 @@
-TODO: update readme
+# Maze Solver with NEAT and Visualization
 
-This project utilises the NeuroEvolution of Augmented Topologies (NEAT) algorithm to solve randomly generated mazes.
+This repository contains Python scripts for solving mazes using the NeuroEvolution of Augmented Topologies (NEAT) algorithm and visualizing the process.
 
-NOTE: When changing the maze size, don't forget to change the number of inputs, in the config file, accordingly. 
+## Contents
 
-
-# Neat maze solver
-
-Simple overview of use/purpose.
+- [Description](#description)
+- [Requirements](#requirements)
+- [Usage](#usage)
+- [Scripts](#scripts)
+- [Contributors](#contributors)
+- [License](#license)
+- [References](#references)
 
 ## Description
 
-An in-depth paragraph about your project and overview of use.
+The project includes three main Python scripts:
 
-## Getting Started
+1. **neat_solver.py**: Implements a maze-solving algorithm using NEAT. Given a maze, the solver uses NEAT to evolve a solution, finding the optimal path from the start to the goal.
+   
+2. **maze_maker.py**: Generates randomized mazes with specified characteristics, such as size, obstacle density, and minimum route length. The mazes are represented as numpy arrays, with different values denoting empty cells, walls, start, and end points.
 
-### Dependencies
+3. **visualizer.py**: Provides a visualization of a maze-solving process. It uses pygame to create a graphical interface where the NEAT solver navigates through the maze, displaying the path and progress in real-time.
 
-see requirements.txt for all dependencies
+4. **neat-configuration.txt**: Configuration file where all parameters are defined. 
 
-### Installing
+## Requirements
 
-* How/where to download your program
-* Any modifications needed to be made to files/folders
+- Python 3.x
+- numpy
+- neat-python
+- pygame
 
-### Executing program
+You can install the dependencies using pip:
 
-* How to run the program
-* Step-by-step bullets
 ```
-code blocks for commands
-```
-
-## Help
-
-Any advise for common problems or issues.
-```
-command to run if program contains helper info
+pip install numpy neat-python pygame
 ```
 
-## Authors
+## Usage
 
-Contributors names and contact info
+- Run `NEATclass.py` This file runs everything.
 
-Hugo Woutersen
+## Scripts
 
-## Version History
+- `neat_solver.py`: NEAT algorithm implementation for solving mazes.
+- `maze_maker.py`: Maze generation script.
+- `visualizer.py`: Visualization script for maze solving.
+- `neat-configuration.txt`: The configuration file for NEAT
 
-* 0.2
-    * Various bug fixes and optimizations
-    * See [commit change]() or See [release history]()
-* 0.1
-    * Initial Release
+## Contributors
+
+- https://github.com/oEg8
 
 ## License
 
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
+This project is licensed under the MIT License
 
-## Acknowledgments
+## References
 
-Inspiration, code snippets, etc.
-* [awesome-readme](https://github.com/matiassingers/awesome-readme)
-* [PurpleBooth](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)
-* [dbader](https://github.com/dbader/readme-template)
-* [zenorocha](https://gist.github.com/zenorocha/4526327)
-* [fvcproductions](https://gist.github.com/fvcproductions/1bfc2d4aecb01a834b46)
+- NEAT-Python: [GitHub](https://github.com/CodeReclaimers/neat-python)
+- Pygame Documentation: [Pygame](https://www.pygame.org/docs/)
