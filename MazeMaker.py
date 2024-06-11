@@ -17,7 +17,7 @@ class MazeMaker:
     2: start
     3: end
     """
-    def __init__(self, rows: int, columns: int, obstacle_ratio: float, minimum_route_length: int) -> None:
+    def __init__(self, rows: int, columns: int, obstacle_ratio: float, minimum_route_length: int, seed: int = None) -> None:
         """
         Initialize the MazeMaker object.
 
@@ -29,23 +29,19 @@ class MazeMaker:
         """
         self.rows = rows
         self.columns = columns
-
-        # comment for random mazes
-        np.random.seed(354)
-
-        self.grid = np.zeros((rows, columns), dtype=np.int32)
         self.obstacle_ratio = obstacle_ratio
         self.minimum_route_length = minimum_route_length
-        self.grid_with_obstacles = self.grid
-        self.grid_with_obstacles = self.create_obstacles(self.obstacle_ratio)
+        self.seed = np.random.seed(seed)
+
+        self.final_grid = self.build_grid(self.obstacle_ratio)
 
 
     def random_start_goal(self) -> tuple:
         """
-        Generates random start coordinate and sets the goal coordinate to the opposite.
+        Generates random start coordinate on the maze's border and sets goal coordinate opposite from start.
 
         Returns:
-            tuple: A tuple containing the start and end coordinates.
+            tuple: Tuple containing start coordinates and goal coordinates.
         """
         rng_side = np.random.randint(0, 4)
 
@@ -77,12 +73,13 @@ class MazeMaker:
             list: A list of valid neighbours.
         """
         neighbours = []
+
         if square[ROW] < (self.rows -1) and search_grid[square[ROW]+1][square[COL]] < -1:
             neighbours.append((square[ROW]+1, square[COL]))
         if square[ROW] > 0 and search_grid[square[ROW]-1][square[COL]] < -1:
             neighbours.append((square[ROW]-1, square[COL]))
         if square[COL] > 0 and search_grid[square[ROW]][square[COL]-1] < -1:
-            neighbours.append((square[ROW], square[COL]-1))
+            neighbours.append((square[ROW], square[COL]-1))           
         if square[COL] < (self.columns -1) and search_grid[square[ROW]][square[COL]+1] < -1:
             neighbours.append((square[ROW], square[COL]+1))
 
@@ -179,7 +176,7 @@ class MazeMaker:
         """
         found_route = self.find_route(self.start_coor,
                                       self.goal_coor,
-                                      self.grid_with_obstacles)
+                                      self.final_grid)
         if len(found_route) >= min_route_length:
             self.optimal_route = found_route
             return True
@@ -188,51 +185,48 @@ class MazeMaker:
             return False
 
 
-    def create_obstacles(self, obstacle_ratio: float) -> np.ndarray:
+    def build_grid(self, obstacle_ratio: float) -> np.ndarray:
         """
-        Create obstacles for the maze.
-
-        Parameters:
-            obstacle_ratio (float): The ratio of obstacles to empty cells.
+        Creates obstacles for the maze based on the obstacle ratio.
 
         Returns:
-            np.ndarray: The grid with obstacles.
+            np.ndarray: Grid with obstacles.
         """
         while True:
-            self.grid_with_obstacles = np.random.choice([0, 1],
+            self.final_grid = np.random.choice([0, 1],
                                                         (self.rows, self.columns),
                                                         p=[1-obstacle_ratio, obstacle_ratio])  # randomly creates obstacles
             self.start_coor, self.goal_coor = self.random_start_goal()
-            self.grid_with_obstacles[self.start_coor] = 2
-            self.grid_with_obstacles[self.goal_coor] = 3
+            self.final_grid[self.start_coor] = 2
+            self.final_grid[self.goal_coor] = 3
             path_exists = self.path_check(self.minimum_route_length)
             if path_exists:
                 break
 
-        return self.grid_with_obstacles
+        return self.final_grid
 
 
     def return_maze(self) -> np.ndarray:
         """
-        Return the maze grid.
+        Returns the generated maze with obstacles.
 
         Returns:
             np.ndarray: The maze grid.
         """
-        return self.grid_with_obstacles
+        return self.final_grid
 
 
-    def return_optimal_route(self) -> list[tuple]:
+    def return_optimal_route(self) -> list:
         """
-        Return the optimal route.
+        Returns the optimal route found in the maze.
 
         Returns:
-            list[tuple]: The optimal route.
+            list: List of tuples representing the optimal route.
         """
         return self.optimal_route
 
 
-    def return_directions(self, step_list: list) -> list:
+    def return_directions(self, step_list: list) -> list[int]:
         """
         Return directions taken given a path.
 
@@ -251,33 +245,33 @@ class MazeMaker:
 
             # Maps direction to a numeric value
             if direction == (-1, 0):
-                directions.append(UP)
+                directions.append(UP)  # up
             elif direction == (1, 0):
-                directions.append(DOWN)
+                directions.append(DOWN)  # down
             elif direction == (0, -1):
-                directions.append(LEFT)
+                directions.append(LEFT)  # left
             elif direction == (0, 1):
-                directions.append(RIGHT)
+                directions.append(RIGHT)  # right
 
         return directions
 
 
-    def return_start_coor(self) -> tuple[int, int]:
+    def return_start_coor(self) -> tuple[int]:
         """
-        Return the start coordinates.
+        Returns the start coordinates.
 
         Returns:
-            tuple: The start coordinates.
+            tuple (int): Start coordinates.
         """
         return self.start_coor
 
 
-    def return_goal_coor(self) -> tuple[int, int]:
+    def return_goal_coor(self) -> tuple[int]:
         """
-        Return the goal coordinates.
+        Returns the goal coordinates.
 
         Returns:
-            tuple: The goal coordinates.
+            tuple (int): Goal coordinates.
         """
         return self.goal_coor
 
