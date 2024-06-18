@@ -7,7 +7,7 @@ This repository contains Python scripts for solving mazes using the NeuroEvoluti
 - [Description](#description)
 - [Requirements](#requirements)
 - [Usage](#usage)
-- [Scripts](#scripts)
+- [Files](#files)
 - [Contributors](#contributors)
 - [License](#license)
 - [References](#references)
@@ -34,19 +34,39 @@ The project includes three main Python scripts:
 You can install the dependencies using pip:
 
 ```
-pip install numpy neat-python pygame
+pip install numpy, neat-python, pygame
 ```
 
 ## Usage
 
-- Run `NEATclass.py` This file runs everything.
+1. Clone the repository:
 
-## Scripts
+```bash
+git clone https://github.com/oEg8/NEAT-maze-solver.git
+```
 
-- `neat_solver.py`: NEAT algorithm implementation for solving mazes.
+2. Navigate to the project directory:
+
+```bash
+cd yourdirectory
+```
+
+3. Run the main script:
+
+```bash
+python NEATclass.py
+```
+
+## Files
+
+- `grids`: Folder where grids are saved.
+- `.gitignore`: Files that are not pushed.
+- `best_neat_solver.plk`: Pre-trained model.
 - `maze_maker.py`: Maze generation script.
-- `visualizer.py`: Visualization script for maze solving.
-- `neat-configuration.txt`: The configuration file for NEAT
+- `neat-configuration.txt`: Model configuration file.
+- `NEATclass.py`: NEAT algorithm implementation for solving mazes.
+- `requirements.txt`: Necessary libraries to run all.
+- `Visualizer.py`: Visualization script for maze solving.
 
 ## Contributors
 

@@ -11,8 +11,19 @@ class Visualiser:
     This class uses the pygame library to create a visualization given a maze,
     start coordinate, end coordinate, and a route.
 
-    - The maze being a numpy array (0: empty cell, 1: wall, 2: start, 3: end)
-    - The route being a list of directions (0: up, 1: down, 2: left, 3: right)
+    The maze being a numpy array (0: empty cell, 1: wall, 2: start, 3: end)
+    The route being a list of directions (0: up, 1: down, 2: left, 3: right)
+
+
+    Attributes
+    __________
+    draw_maze           : None
+                        Draw the maze and respond to following keyboard inputs:
+                        - 'p':    Plays and pauses the visualisation
+                        - 'Esc':  Stops and exits the visualisation
+                        - 'up arrow':     Increases fps with 1
+                        - 'down arrow':   Decreases fps with 1
+                        - 'r':    Resets and replays the visualisation
     """
     def __init__(self, grid: np.ndarray, start: tuple[int, int], goal: tuple[int, int], route: list[tuple[int, int]]) -> None:
         """
@@ -56,7 +67,7 @@ class Visualiser:
         self.solved = False
 
 
-    def draw_maze(self):
+    def draw_maze(self) -> None:
         """
         Draw the maze and respond to following keyboard inputs:
 

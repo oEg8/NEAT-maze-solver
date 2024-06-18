@@ -6,7 +6,6 @@ import numpy as np
 from Visualiser import Visualiser
 import pickle
 
-
 ROW = 0
 COL = 1
 
@@ -29,12 +28,33 @@ def load_model(filename: str):
 
 class neatSolver:
     """
-    This class uses a NeuroEvolution of Augmented Topologies (NEAT) algorithm
-    to solve a maze.
+    This class uses a NeuroEvolution of Augmented Topologies (NEAT) algorithm to solve a maze.
+
+
+    Attributes
+    __________
+    move                : list[int, int]
+                        Move the player by one step in a given direction.
+    random_move         : tuple[list[int, int], int]
+                        Move the player randomly among possible actions.
+    novelty_score       : float
+                        Calculate the novelty score based on unique positions.
+    possible_actions    :list[int, int]
+                        Return possible moves given a grid and a position.
+    distance_to_goal    : int
+                        Calculate Manhattan distance from current position to goal.
+    reset_position      : list[int, int]
+                        Reset the player position to the starting position.
+    calc_fitness        : int
+                        Calculate the fitness for a given genome.
+    eval_genomes        : None
+                        Evaluate the genomes and assign fitness.
+    run                 : tuple[int, int, int]
+                        Run the NEAT algorithm.
     """
     def __init__(self, grid: np.ndarray, start: tuple[int, int], goal: tuple[int, int]) -> None:
         """
-        Initialize the neatSolver object.
+        Initializes the neatSolver object.
 
         Parameters:
             grid (np.ndarray): The maze grid.
@@ -56,43 +76,43 @@ class neatSolver:
         np.random.seed(1)
 
     
-    def move(self, pos: list[int, int], action: int) -> list[int, int]:
+    def move(self, posistion: list[int, int], action: int) -> list[int, int]:
         """
         Move the player by one step in a given direction.
 
         Parameters:
-            pos (List[int, int]): Current position.
+            posistion (list): Current position.
             action (int): Action to take.
 
         Returns:
-            List[int, int]: New position after the move.
+            list: New position after the move.
         """
         if action == UP:
-                pos[ROW] -= 1
+                posistion[ROW] -= 1
         elif action == DOWN:
-                pos[ROW] += 1
+                posistion[ROW] += 1
         elif action == LEFT:
-                pos[COL] -= 1
+                posistion[COL] -= 1
         elif action == RIGHT:
-                pos[COL] += 1
+                posistion[COL] += 1
 
-        return pos
+        return posistion
     
 
-    def random_move(self, pos: list[int, int]) -> tuple[list[int, int], int]:
+    def random_move(self, position: list[int, int]) -> tuple[list[int, int], int]:
         """
         Move the player randomly among possible actions.
 
         Parameters:
-            pos (List[int, int]): Current position.
+            position (List[int, int]): Current position.
 
         Returns:
             Tuple[List[int, int], int]: New position after the move and the action taken.
         """
-        random_move = np.random.choice(self.possible_actions(self.grid, pos))
-        pos = self.move(pos, random_move)
+        random_move = np.random.choice(self.possible_actions(self.grid, position))
+        position = self.move(position, random_move)
 
-        return pos, random_move
+        return position, random_move
     
 
     def novelty_score(self, path: list[tuple[int, int]]) -> float:
@@ -100,7 +120,7 @@ class neatSolver:
         Calculate the novelty score based on unique positions.
 
         Parameters:
-            path (List[Tuple[int, int]]): List of positions visited.
+            path (list): List of positions visited.
 
         Returns:
             float: Novelty score.
@@ -121,45 +141,45 @@ class neatSolver:
         return novel_score
 
 
-    def possible_actions(self, grid: np.ndarray, pos: tuple[int, int]) -> list[int]:
+    def possible_actions(self, grid: np.ndarray, position: tuple[int, int]) -> list[int]:
         """
         Return possible moves given a grid and a position.
 
         Parameters:
             grid (np.ndarray): The maze grid.
-            pos (Tuple[int, int]): Current position.
+            pos (tuple): Current position.
 
         Returns:
-            List[int]: List of possible actions.
+            list: List of possible actions.
         """
         actions = []
-        if pos[ROW] - 1 >= 0 and grid[pos[ROW] - 1][pos[COL]] != 1:
+        if position[ROW] - 1 >= 0 and grid[position[ROW] - 1][position[COL]] != 1:
             actions.append(UP)
-        if pos[ROW] + 1 < len(grid) and grid[pos[ROW] + 1][pos[COL]] != 1:
+        if position[ROW] + 1 < len(grid) and grid[position[ROW] + 1][position[COL]] != 1:
             actions.append(DOWN)
-        if pos[COL] - 1 >= 0 and grid[pos[ROW]][pos[COL] - 1] != 1:
+        if position[COL] - 1 >= 0 and grid[position[ROW]][position[COL] - 1] != 1:
             actions.append(LEFT)
-        if pos[COL] + 1 < len(grid[ROW]) and grid[pos[ROW]][pos[COL] + 1] != 1:
+        if position[COL] + 1 < len(grid[ROW]) and grid[position[ROW]][position[COL] + 1] != 1:
             actions.append(RIGHT)
 
         return actions
 
 
-    def distance_to_goal(self, pos: tuple[int, int], goal: tuple[int, int]) -> int:
+    def distance_to_goal(self, position: tuple[int, int], goal: tuple[int, int]) -> int:
         """
         Calculate Manhattan distance from current position to goal.
 
         Parameters:
-            pos (Tuple[int, int]): Current position.
-            goal (Tuple[int, int]): Goal position.
+            position (tuple): Current position.
+            goal (tuple): Goal position.
 
         Returns:
             int: Manhattan distance to goal.
         """
-        return abs(pos[ROW] - goal[ROW]) + abs(pos[COL] - goal[COL])
+        return abs(position[ROW] - goal[ROW]) + abs(position[COL] - goal[COL])
 
 
-    def reset_pos(self) -> list[int, int]:
+    def reset_position(self) -> list[int, int]:
         """
         Reset the player position to the starting position.
 
@@ -181,66 +201,66 @@ class neatSolver:
             int: Fitness value.
         """
         fitness = 0
-        pos = self.reset_pos()
+        position = self.reset_position()
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         actions = []
-        path = [pos]
+        path = [position]
 
         for _ in range(self.max_steps):
             # define the state which will be used as input for the algorithm
             state = list(grid.flatten())
-            state.extend([pos[ROW], pos[COL], goal[ROW], goal[COL],
-                          self.distance_to_goal(pos, goal)])
+            state.extend([position[ROW], position[COL], goal[ROW], goal[COL],
+                          self.distance_to_goal(position, goal)])
 
             # generate output from input (state)
             output = net.activate(state)
 
             action = np.argmax(output)
-            possible_actions = self.possible_actions(grid, pos)
+            possible_actions = self.possible_actions(grid, position)
 
             # checks if the action is possible and take it if so, otherwise
             # step is illegal so genome will be penalized
             if action in possible_actions:
                 fitness -= self.step_cost
-                pos = self.move(pos, action)
+                position = self.move(position, action)
                 actions.append(action)
             else:
                 fitness -= self.illegal_pen
                 # to introduce randomness the genome will take a random action a percentage of times
                 # (illegal_mutation_rate) the genome wants to take a illegal action
                 if np.random.choice([0, 1], p=[1-self.illegal_mutation_rate, self.illegal_mutation_rate]):
-                    pos, random_move = self.random_move(pos)
+                    position, random_move = self.random_move(position)
                     actions.append(random_move)
 
-            path.append(pos)
+            path.append(position)
 
             # checks if the goal is reached and breaks out of the loop if so
-            if pos[ROW] == goal[ROW] and pos[COL] == goal[COL]:
+            if position[ROW] == goal[ROW] and position[COL] == goal[COL]:
                 fitness += self.goal_reward
                 # saves the winning directions for viualisation
                 self.winner_directions = actions
                 break
 
-        fitness -= self.distance_to_goal(pos, goal)
+        fitness -= self.distance_to_goal(position, goal)
         fitness -= self.novelty_score(path)
 
         return fitness
 
 
-    def eval_genomes(self, genomes, config) -> None:
+    def eval_genomes(self, genomes, config: str) -> None:
         """
         Evaluate the genomes and assign fitness.
 
         Parameters:
             genomes: List of genomes to evaluate.
-            config: NEAT configuration.
+            config (str): NEAT configuration file path.
         """
         for genome_id, genome in genomes:  # genome_id is used by the neat-python library  
             fitness = self.calc_fitness(genome, config)
             genome.fitness = fitness
 
 
-    def run(self, config_file: str, num_generations: int):
+    def run(self, config_file: str, num_generations: int) -> tuple[int, int, int]:
         """
         Run the NEAT algorithm.
 
@@ -303,13 +323,13 @@ if __name__ == '__main__':
                "NUM_GENERATIONS": [],
                "TIME_TO_SOLVE": []}
 
-    for i in range(10):  # increase for learning on more mazes
+    for i in range(2):  # increase for learning on more mazes
         start_time = time.time()
 
         maze = MazeMaker(4, 4, 0.5, 7)  # NOTE: when changing maze size, change input paramater accordingly in config file.
-        grid = maze.return_maze()
-        start = (maze.return_start_coor()[ROW], maze.return_start_coor()[COL])
-        goal = (maze.return_goal_coor()[ROW], maze.return_goal_coor()[COL])
+        grid = maze.get_maze()
+        start = (maze.get_start()[ROW], maze.get_start()[COL])
+        goal = (maze.get_goal()[ROW], maze.get_goal()[COL])
 
         if os.path.exists('grids'):
             np.save(f'grids/grid{i}.npy', grid)
